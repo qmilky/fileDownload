@@ -4,7 +4,7 @@
  * */
 namespace test\fileDownload;
 class fileDownload {
-    private $_speed = 1024; // 下载速度 ,默认 1M
+    private $_speed = 10240; // 下载速度 ,默认 1M
 
     /**
      * 下载方法
@@ -59,7 +59,7 @@ class fileDownload {
                 header(sprintf('content-range:bytes %s-%s/%s', $ranges['start'], $ranges['end'], $size));
                 // fp 指针跳到断点位置
                 //fseek($fp, sprintf('%u', $ranges['start']));
-                fseek($fp, sprintf('%u', filesize('./test.zip')));  // 这样可以保证不会多余文件，test.zip文件的大小就相当于断点
+                fseek($fp, sprintf('%u', filesize('./test.zip')));  // 这样可以保证不会多余文件，test.zip文件的大小就相当于断点; 先用 is_file() 判断文件存在再用 filesize();
                 //fseek($fp1, sprintf('%u', $ranges['start']));
 
                 // 使用续传,此处每次断点重新打开继续下载时都会执行一次
@@ -74,7 +74,10 @@ class fileDownload {
             }
             // feof（）检测是否已经到达文件末尾，文件指针到了EOF 或者出错时返回 true，否则返回一个错误（包括socket超时），其他情况则返回 false
             // $fp 规定要检查的打开文件，$fp 参数是一个文件指针，这个文件指针必须有效，并且必须指向一个由 fopen 或 fsockopen（） 成功打开（但还没有被fclose（）关闭）的文件
+            $buffer = round($this->_speed*1024,0);
+            $file_count = 0;  // 记录总共读取了多少
             while (!feof($fp))
+//            while (!feof($fp) && $size - $file_count > 0)
             {
                 //此处会一直执行，直到文件下载完成
                 // fread（resource $handle , int $length） — 读取文件（可安全用于二进制文件），$handle 文件系统指针，是典型地由 fopen() 创建的 resource(资源)。
@@ -82,14 +85,16 @@ class fileDownload {
                 //file_put_contents('./log.php', var_export([300,$this->_speed*1024],true), FILE_APPEND);  // 测试是否走断点
                 //设置文件最长执行时间
                 set_time_limit(15);
-                echo $res = fread($fp, round($this->_speed*1024,0));// 变量名 $this->_speed要写对不能写成 $this->__speed，否则文件被损坏无法解压
+                echo $res = fread($fp, $buffer);// 变量名 $this->_speed要写对不能写成 $this->__speed，否则文件被损坏无法解压
                 // 实现file_put_contents高并发写入文件，需要使用到第三个参数flags，flags参数为LOCK_EX即可在高并发时获得一个独占锁定。如：file_put_contents('pickles.txt', $contents, FILE_APPEND | LOCK_EX);
                 //$res = file_put_contents('./test.zip', fread($fp, round($this->__speed * 1024, 0)), FILE_APPEND);
                 //file_put_contents('./log.php', var_export([$res], true), FILE_APPEND);
                 fwrite($fp1, $res);  //此处将内容以追加的方式存储到对应文件中
+                // 此处也可以累加记录读取的文件大小，方便 while 判断是否读取完文件
+                 $file_count += $buffer;
 
                 ob_flush();  // 刷新PHP自身的缓冲区作用
-//                sleep(1); // 用于测试，减慢下载速度
+                sleep(1); // 用于测试，减慢下载速度
             }
 
             ($fp != null) && fclose($fp);  // 2 个条件同时执行，相当于若 $fp 不为空就关闭该文件

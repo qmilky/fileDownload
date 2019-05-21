@@ -72,7 +72,11 @@ fdipzone@ubuntu:~/Downloads$ wget -c -O test.rar http://demo.fdipzone.com/demo.p
 
 可以看到会从断点的位置(%20)开始下载。
 
+
+
+
 wget -c -O test.zip http://local.mbook.cc/test/fileDownload/index.php  // -c 开启断点续传，-O即将记录写入到文件中
 wget -c -a test1.zip http://local.mbook.cc/test/fileDownload/index.php  // -a 将记录以追加的方式写入到文件中, 不指定 -O 文件名的话会默认选取最后一个'/'后面的为文件名写入，因此，文件会写入index.php
 // wet 记录的断点位置有错误，断点一次没有问题，但是2次及2次以上就会出错，文件内容会多出一部分
 测试之前先在fileDownload 文件夹中新建文件 test.zip 权限为 757
+注意：test1.php 文件是测试文件，使用 wget -c -a test1.zip http://local.mbook.cc/test/fileDownload/index.php  下载时，文件直接下载到 index.php 中，导致出错，test1.zip 中一直是 317kb 的文件，而且日志在index.php 和 fileDownload.php 中一直打印不出来，是因为下载的文件内容存入导致语法错误；在编辑器 phpstorm 中删除乱码的文件内容后，发现文件大小还是四十多兆，此时用 vim 打开仍然可以发现乱码的文件内容。因此将 index.php 改为 index1.php,然后新建 index.php.
