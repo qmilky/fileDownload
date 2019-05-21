@@ -71,3 +71,8 @@ fdipzone@ubuntu:~/Downloads$ wget -c -O test.rar http://demo.fdipzone.com/demo.p
 2013-06-30 16:53:45 (543 KB/s) - 已保存 “test.rar” [10445121/10445121])
 
 可以看到会从断点的位置(%20)开始下载。
+
+wget -c -O test.zip http://local.mbook.cc/test/fileDownload/index.php  // -c 开启断点续传，-O即将记录写入到文件中
+wget -c -a test1.zip http://local.mbook.cc/test/fileDownload/index.php  // -a 将记录以追加的方式写入到文件中, 不指定 -O 文件名的话会默认选取最后一个'/'后面的为文件名写入，因此，文件会写入index.php
+// wet 记录的断点位置有错误，断点一次没有问题，但是2次及2次以上就会出错，文件内容会多出一部分
+测试之前先在fileDownload 文件夹中新建文件 test.zip 权限为 757

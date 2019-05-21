@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <title>Document</title>
+</head>
+<body>
+<button id="download">下载文件</button>
+
+</body>
+<script>
+    var down = document.querySelector('#download');
+    down.addEventListener('click',function(e){
+        $.ajax({
+            url: 'index.php',
+            type: 'GET',
+            dataType:"json", // 接收到的数据类型
+            async:"false",
+            contentType: "application/json",  // 发送的数据类型：String，xml，html，script，json，jsonp，text
+            success: function(data)
+            {
+                console.log('成功啦');
+                console.log(data);
+            },
+            error: function()
+            {
+
+            },
+            beforeSend: function(request){
+                request.setRequestHeader("Range","bytes=0-99");
+                request.setRequestHeader("request-type","ajax"); // 自定义添加请求头，后端可以判断是否是 ajax 请求，request-type中间是连接符-而不是下划线_
+            }
+
+        });
+    })
+</script>
+</html>
